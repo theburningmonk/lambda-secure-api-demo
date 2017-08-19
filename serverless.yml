@@ -1,0 +1,42 @@
+service: secure-api-demo
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: us-east-1
+
+  apiKeys:
+    - devKey
+  usagePlan:
+    quota:
+      limit: 500
+      offset: 2
+      period: MONTH
+    throttle:
+      burstLimit: 20
+      rateLimit: 10
+
+functions:
+  open:
+    handler: handler.handler
+    events:
+      - http:
+          path: /
+          method: get
+
+  with-api-key:
+    handler: handler.handler
+    events:
+      - http:
+          path: /api_key
+          method: get
+          private: true
+
+  with-iam:
+    handler: handler.handler
+    events:
+      - http:
+          path: /iam
+          method: get
+          authorizer: aws_iam
